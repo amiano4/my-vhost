@@ -5,6 +5,7 @@ import boxen from "boxen";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import figlet from "figlet";
+import hostAlias from "./host-alias";
 
 console.log(chalk.red(figlet.textSync("my-vhost", { horizontalLayout: "full" })));
 
