@@ -11,8 +11,10 @@ const hostAlias = {
     }
 
     if (this.validateAliasName(alias)) {
+      const content = (comment ? `\n# ${comment}` : ``) + `\n${ipAddress}\t\t${alias}\n`;
+
       // Append the host alias to the hosts file
-      fs.appendFile(this.path, `\n# ${comment}\n${ipAddress}\t\t${alias}\n`, (err) => {
+      fs.appendFile(this.path, content, (err) => {
         if (err) throw err;
         console.log(`The host alias '${alias}' has been added to the hosts file.`);
       });

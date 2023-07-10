@@ -42,11 +42,12 @@ const argv = yargs(hideBin(process.argv))
 const host = argv.h || argv.host || "127.0.0.1";
 const alias = argv.a || argv.alias;
 const directory = argv.d || argv.dir;
+const comment = argv.c || argv.comment;
 
 // validate ip
 validateIPAddress(host);
 
-hostAlias.set(alias, host);
+hostAlias.set(alias, host, comment);
 
 function validateIPAddress(ip) {
   // Regular expression to validate IP address format
