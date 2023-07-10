@@ -5,7 +5,7 @@ import boxen from "boxen";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import figlet from "figlet";
-import hostAlias from "./host-alias";
+import hostAlias from "./host-alias.js";
 
 console.log(chalk.red(figlet.textSync("my-vhost", { horizontalLayout: "full" })));
 
@@ -38,12 +38,14 @@ const argv = yargs(hideBin(process.argv))
 //   process.exit();
 // }
 
-const host = argv.h || argv.host;
+const host = argv.h || argv.host || "127.0.0.1";
 const alias = argv.a || argv.alias;
 const directory = argv.d || argv.dir;
 
 // validate ip
 validateIPAddress(host);
+
+hostAlias.set(alias, host);
 
 function validateIPAddress(ip) {
   // Regular expression to validate IP address format
