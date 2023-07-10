@@ -22,6 +22,7 @@ const argv = yargs(hideBin(process.argv))
   })
   .option("a", { alias: "alias", describe: "Alias name", type: "string", demandOption: true })
   .option("d", { alias: "dir", describe: "Root directory to be hosted", type: "string", demandOption: true })
+  .option("c", { alias: "comment", describe: "Additional comment (optional)", type: "string", demandOption: false })
   .help(true)
   .showHelpOnFail(true)
   .parseSync();
