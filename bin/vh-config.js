@@ -25,6 +25,13 @@ const vhConfig = {
       await createConfig(path);
     }
   },
+  getPath: function (key) {},
+  addVirtualHost: function () {
+    // including new config file to the apache server
+    fs.appendFile(apacheConfDirectory + "httpd.conf", "\n# my-vhost config\nInclude conf/my-vhost.conf\n", (err) => {
+      if (err) throw err;
+    });
+  },
 };
 
 function getXamppInstallationDirectory() {
