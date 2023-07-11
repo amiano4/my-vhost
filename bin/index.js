@@ -6,6 +6,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import figlet from "figlet";
 import hostAlias from "./host-alias.js";
+import vhConfig from "./vh-config.js";
 
 console.log(chalk.red(figlet.textSync("my-vhost", { horizontalLayout: "full" })));
 
@@ -47,7 +48,9 @@ const comment = argv.c || argv.comment;
 // validate ip
 validateIPAddress(host);
 
-hostAlias.set(alias, host, comment);
+vhConfig.init();
+
+// hostAlias.set(alias, host, comment);
 
 function validateIPAddress(ip) {
   // Regular expression to validate IP address format
