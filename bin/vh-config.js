@@ -14,10 +14,12 @@ const vhConfig = {
     const fileExists = await checkFileExists(path);
 
     if (fileExists) {
-      const data = JSON.parse(fs.readFileSync(this.configPath, "utf8"));
+      const data = JSON.parse(fs.readFileSync(path, "utf8"));
 
       if (!data["xampp-directory"]) {
         await createConfig(path);
+      } else {
+        console.log("Existing json config found");
       }
     } else {
       await createConfig(path);
@@ -54,23 +56,46 @@ function checkFileExists(filePath) {
 }
 
 async function createConfig(path) {
-  const directory = await getXamppInstallationDirectory();
-  const content = JSON.stringify(
-    {
-      "xampp-directory": directory,
-    },
-    null,
-    2
-  );
+  try {
+    const directory = await getXamppInstallationDirectory();
+    const content = JSON.stringify(
+      {
+        "xampp-directory": directory,
+        "vhost-conf": directory + "\\apache\\conf\\my-vhost.conf",
+      },
+      null,
+      2
+    );
 
-  fs.writeFile(path, content, "utf8", (error) => {
-    if (error) {
-      console.error("Error creating the file:", error);
-      return;
-    }
+    // creating v-host.json
+    fs.writeFile(path, content, "utf8", (error) => {
+      if (error) {
+        console.error("Error creating the file:", error);
+        return;
+      }
 
-    console.log("My-vhost json config file created successfully");
-  });
+      console.log("My-vhost json config file created successfully");
+    });
+
+    const apacheConfDirectory = directory + "\\apache\\conf\\";
+
+    // creating the my-vhost.conf inside the xampp directory
+    fs.writeFile(apacheConfDirectory + "my-vhost.conf", "# my-vhost aliases\n", "utf8", (error) => {
+      if (error) {
+        console.error("Error creating the file:", error);
+        return;
+      }
+
+      // including new config file to the apache server
+      fs.appendFile(apacheConfDirectory + "httpd.conf", "\n# my-vhost config\nInclude conf/my-vhost.conf\n", (err) => {
+        if (err) throw err;
+      });
+
+      console.log("Virtual Hosts configuration has been set.");
+    });
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 export default vhConfig;
