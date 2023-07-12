@@ -10,6 +10,8 @@ const vhConfig = {
     return join(rootDirectory, "v-host.json");
   },
   init: async function () {
+    console.log("Check initialization of directory files");
+
     const path = this.configPath();
     const fileExists = await checkFileExists(path);
 
@@ -18,18 +20,43 @@ const vhConfig = {
 
       if (!data["xampp-directory"]) {
         await createConfig(path);
-      } else {
-        console.log("Existing json config found");
       }
     } else {
       await createConfig(path);
     }
   },
-  getPath: function (key) {},
-  addVirtualHost: function () {
+  getPath: function (key) {
+    try {
+      const data = JSON.parse(fs.readFileSync(this.configPath(), "utf8"));
+      return data[key];
+    } catch (err) {
+      console.error("Unable to retreive key data");
+      return false;
+    }
+  },
+  addVirtualHost: function (alias, directory) {
+    console.log(`Writing new virtual host configuration`);
+
+    directory = directory.replaceAll("\\", "/");
+
+    const content = `
+<VirtualHost ${alias}>
+    ServerName ${alias}
+    ServerAlias www.${alias}
+    DocumentRoot "${directory}"
+    ##ErrorLog "logs/dummy-host2.example.com-error.log"
+    ##CustomLog "logs/dummy-host2.example.com-access.log" common
+  <Directory "${directory}">
+    AllowOverride All
+    Require all granted
+  </Directory>
+</VirtualHost>
+\n`;
+
     // including new config file to the apache server
-    fs.appendFile(apacheConfDirectory + "httpd.conf", "\n# my-vhost config\nInclude conf/my-vhost.conf\n", (err) => {
+    fs.appendFile(this.getPath("vhost-conf"), content, (err) => {
       if (err) throw err;
+      console.log(`Successfully added new virtual host to the server`);
     });
   },
 };
@@ -98,7 +125,7 @@ async function createConfig(path) {
         if (err) throw err;
       });
 
-      console.log("Virtual Hosts configuration has been set.");
+      console.log("Virtual Hosts configuration file has been set.");
     });
   } catch (err) {
     console.error(err);

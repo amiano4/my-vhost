@@ -8,7 +8,7 @@ import figlet from "figlet";
 import hostAlias from "./host-alias.js";
 import vhConfig from "./vh-config.js";
 
-console.log(chalk.red(figlet.textSync("my-vhost", { horizontalLayout: "full" })));
+console.log(chalk.red(figlet.textSync("my-vhost", { horizontalLayout: "full" })), "\n");
 
 const usage = "\nUsage: my-vhost [-h <host>] -a <alias> -d <dir> \n";
 
@@ -28,29 +28,22 @@ const argv = yargs(hideBin(process.argv))
   .showHelpOnFail(true)
   .parseSync();
 
-// if (argv.alias == null && argv.a == null) {
-//   console.log(chalk.red(figlet.textSync("my-vhost", { horizontalLayout: "full" })));
-//   console.log("Alias name (DNS alias sample) is required");
-//   process.exit();
-// }
+try {
+  const host = argv.h || argv.host || "127.0.0.1";
+  const alias = argv.a || argv.alias;
+  const directory = argv.d || argv.dir;
+  const comment = argv.c || argv.comment;
 
-// if (argv.dir == null && argv.d == null) {
-//   console.log(chalk.red(figlet.textSync("my-vhost", { horizontalLayout: "full" })));
-//   console.log("Please add the root directory to be hosted");
-//   process.exit();
-// }
-
-const host = argv.h || argv.host || "127.0.0.1";
-const alias = argv.a || argv.alias;
-const directory = argv.d || argv.dir;
-const comment = argv.c || argv.comment;
-
-// validate ip
-validateIPAddress(host);
-
-vhConfig.init();
-
-// hostAlias.set(alias, host, comment);
+  // validate ip
+  if (validateIPAddress(host)) {
+    vhConfig.init().then(async () => {
+      await hostAlias.set(alias, host, comment);
+      vhConfig.addVirtualHost(alias, directory);
+    });
+  }
+} catch (err) {
+  console.error(err);
+}
 
 function validateIPAddress(ip) {
   // Regular expression to validate IP address format

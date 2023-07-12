@@ -6,7 +6,7 @@ const hostAlias = {
   set: async function (alias, ipAddress, comment) {
     // Check if the script is running with administrative privileges
     if (process.platform !== "win32" || !(await isAdmin())) {
-      console.log("Please run this script with administrative privileges.");
+      console.log("Please run this script with administrative privileges");
       process.exit(1);
     }
 
@@ -16,13 +16,15 @@ const hostAlias = {
       // Append the host alias to the hosts file
       fs.appendFile(this.path, content, (err) => {
         if (err) throw err;
-        console.log(`The host alias '${alias}' has been added to the hosts file.`);
+        console.log(`Added new alias to the system host config`);
       });
     }
   },
   validateAliasName: function (alias) {
     // Read file synchronously
     try {
+      console.log(`Validating alias name`);
+
       const data = fs.readFileSync(this.path, "utf8");
 
       // Split the file content into an array of lines
